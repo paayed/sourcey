@@ -1,69 +1,7 @@
 import { useContext } from "preact/hooks";
 import { NavigationContext, OptionsContext, SiteContext } from "../../renderer/context.js";
 import { SocialIcon, socialLabels } from "../ui/SocialIcon.js";
-import type { SiteNavGroup } from "../../core/navigation.js";
-
-/**
- * Colored method badges for API sidebar items.
- */
-function MethodPill({ method }: { method: string }) {
-  const m = method.toUpperCase();
-  const label = m === "DELETE" ? "DEL" : m;
-
-  const colors: Record<string, string> = {
-    GET: "bg-green-400/20 dark:bg-green-400/20 text-green-700 dark:text-green-400",
-    POST: "bg-blue-400/20 dark:bg-blue-400/20 text-blue-700 dark:text-blue-400",
-    PUT: "bg-yellow-400/20 dark:bg-yellow-400/20 text-yellow-700 dark:text-yellow-400",
-    DELETE: "bg-red-400/20 dark:bg-red-400/20 text-red-700 dark:text-red-400",
-    DEL: "bg-red-400/20 dark:bg-red-400/20 text-red-700 dark:text-red-400",
-    PATCH: "bg-orange-400/20 dark:bg-orange-400/20 text-orange-700 dark:text-orange-400",
-  };
-
-  return (
-    <span class="flex items-center w-8 h-[1lh] shrink-0">
-      <span class={`px-1 py-0.5 rounded-md text-[0.55rem] leading-tight font-bold ${colors[m] ?? "bg-gray-400/20 text-gray-700"}`}>
-        {label}
-      </span>
-    </span>
-  );
-}
-
-/**
- * Nav groups — shared between desktop sidebar and mobile drawer.
- */
-function NavGroups({ groups, activePageSlug, base }: {
-  groups: SiteNavGroup[];
-  activePageSlug: string | null;
-  base: string;
-}) {
-  return (
-    <>
-      {groups.map((group, gi) => (
-        <div key={group.label} class={gi > 0 ? "mt-5" : ""}>
-          {group.label && (
-            <h5 class="nav-group-label">{group.label}</h5>
-          )}
-          <ul>
-            {group.items.map((item) => {
-              const isActive = item.id === activePageSlug;
-              return (
-                <li key={item.id}>
-                  <a
-                    href={`${base}${item.href}`}
-                    class={`nav-link${isActive ? " active" : ""}`}
-                  >
-                    {item.method && <MethodPill method={item.method} />}
-                    <span class="flex-1 break-words [word-break:break-word]">{item.label}</span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
-    </>
-  );
-}
+import { SidebarNavGroups } from "./SidebarNavGroups.js";
 
 function DropdownChevron() {
   return (
@@ -85,7 +23,6 @@ function SidebarPanelIcon() {
 
 /**
  * API Reference icon — shown in the icon strip when sidebar is COLLAPSED.
- * Represents a code/API document.
  */
 function ApiReferenceIcon() {
   return (
@@ -103,10 +40,7 @@ function ApiReferenceIcon() {
  *
  * Desktop: Fixed full-height panel starting at top:0.
  *
- * COLLAPSED state: Instead of fully hiding, sidebar shrinks to a narrow
- * icon strip (3rem wide). The strip shows:
- *   - Top: expand/open button
- *   - Middle: API Reference icon (tooltip on hover)
+ * COLLAPSED state: Sidebar shrinks to a narrow icon strip (3.5rem wide).
  *
  * Mobile: hidden — a dialog drawer is used instead.
  */
@@ -167,7 +101,6 @@ export function Sidebar() {
     });
   }
 
-  // Restore persisted state immediately (before paint)
   var persisted = false;
   try { persisted = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
   applyState(persisted);
@@ -181,7 +114,7 @@ export function Sidebar() {
       ` }} />
 
       {/* ══════════════════════════════════════════
-          Desktop sidebar — fixed, full height from top:0
+          Desktop sidebar
           ══════════════════════════════════════════ */}
       <div
         id="sidebar"
@@ -193,8 +126,7 @@ export function Sidebar() {
         {/* ── Top bar: Logo + collapse button ── */}
         <div class="sidebar-topbar flex items-center justify-between px-5 h-16 shrink-0
                     border-b border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-300)/0.06)]">
-          {/* Logo — hidden when collapsed */}
-          <a href={logoHref} class="sidebar-logo flex items-center min-w-0 flex-shrink-0 overflow-hidden transition-all duration-200">
+          <a href={logoHref} class="sidebar-logo flex items-center min-w-0 shrink-0 overflow-hidden transition-all duration-200">
             <img
               src={`${base}assets/logo.png`}
               alt={site.name ?? "Logo"}
@@ -202,13 +134,12 @@ export function Sidebar() {
             />
           </a>
 
-          {/* Collapse / Expand button — always visible */}
           <button
             type="button"
             data-sidebar-toggle
             aria-label="Toggle sidebar"
             aria-expanded="true"
-            class="flex-shrink-0 p-1.5 rounded-md
+            class="shrink-0 p-1.5 rounded-md
                    text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-gray-600))]
                    dark:text-[rgb(var(--color-gray-500))] dark:hover:text-[rgb(var(--color-gray-300))]
                    hover:bg-[rgb(var(--color-gray-100))] dark:hover:bg-[rgb(var(--color-gray-800)/0.5)]
@@ -220,7 +151,6 @@ export function Sidebar() {
 
         {/* ── Icon strip — only visible when collapsed ── */}
         <div class="sidebar-icon-strip flex flex-col items-center gap-4 pt-4 flex-1">
-          {/* API Reference icon with tooltip */}
           <div class="relative group">
             <button
               type="button"
@@ -234,7 +164,6 @@ export function Sidebar() {
             >
               <ApiReferenceIcon />
             </button>
-            {/* Tooltip */}
             <div class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2
                         px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap
                         bg-[rgb(var(--color-gray-800))] text-[rgb(var(--color-gray-100))]
@@ -246,11 +175,11 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* ── Scrollable nav — hidden when collapsed ── */}
+        {/* ── Scrollable nav ── */}
         <div class="sidebar-nav-content flex-1 overflow-y-auto overflow-x-hidden">
           <div class="px-4 pt-5 pb-10 text-sm leading-6">
             <nav id="nav" role="navigation">
-              <NavGroups groups={groups} activePageSlug={nav.activePageSlug} base={base} />
+              <SidebarNavGroups groups={groups} activePageSlug={nav.activePageSlug} base={base} />
             </nav>
           </div>
         </div>
@@ -260,7 +189,6 @@ export function Sidebar() {
           Mobile drawer
           ══════════════════════════════════════════ */}
       <dialog id="mobile-nav" class="mobile-nav-dialog">
-        {/* Drawer header with logo */}
         <div class="flex items-center px-4 py-4 border-b border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-800)/0.5)] shrink-0">
           <img
             src={`${base}assets/logo.png`}
@@ -269,7 +197,6 @@ export function Sidebar() {
           />
         </div>
 
-        {/* Tab dropdown — only when multiple tabs */}
         {nav.tabs.length > 1 && (
           <div class="pt-5 px-4 shrink-0">
             <div class="drawer-dropdown">
@@ -298,12 +225,10 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Nav content */}
         <nav class="pt-5 pb-3 px-4 flex-1 overflow-y-auto">
-          <NavGroups groups={groups} activePageSlug={nav.activePageSlug} base={base} />
+          <SidebarNavGroups groups={groups} activePageSlug={nav.activePageSlug} base={base} />
         </nav>
 
-        {/* Footer links + CTA */}
         {(links.length > 0 || primaryAction) && (
           <div class="px-4 py-3 border-t border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-800)/0.5)] shrink-0">
             <ul class="space-y-3">
@@ -334,58 +259,126 @@ export function Sidebar() {
       </dialog>
 
       {/* ══════════════════════════════════════════
-          Collapsed sidebar CSS + docs offset
+          CSS — collapsed sidebar + nav group dropdowns
           ══════════════════════════════════════════ */}
       <style>{`
-        /* ── Default (expanded) state ── */
+        /* ── Sidebar expanded state ── */
 
-        /* Icon strip hidden when expanded */
         #sidebar .sidebar-icon-strip {
           display: none;
         }
 
-        /* Nav content visible when expanded */
         #sidebar .sidebar-nav-content {
           display: flex;
           flex-direction: column;
         }
 
-        /* ── Collapsed state: shrink to icon strip (3rem) ── */
+        /* ── Sidebar collapsed state ── */
+
         #sidebar.sidebar-collapsed {
           width: 3.5rem !important;
         }
 
-        /* Hide logo when collapsed */
         #sidebar.sidebar-collapsed .sidebar-logo {
           width: 0;
           opacity: 0;
           pointer-events: none;
         }
 
-        /* Center the toggle button in the top bar when collapsed */
         #sidebar.sidebar-collapsed .sidebar-topbar {
           justify-content: center;
           padding-left: 0;
           padding-right: 0;
         }
 
-        /* Show icon strip when collapsed */
         #sidebar.sidebar-collapsed .sidebar-icon-strip {
           display: flex;
         }
 
-        /* Hide nav content when collapsed */
         #sidebar.sidebar-collapsed .sidebar-nav-content {
           display: none;
         }
 
-        /* Docs area: push right of sidebar on desktop */
+        .sidebar-nav-group {
+          margin: 0;
+        }
+
+        .sidebar-nav-group > summary {
+          list-style: none;
+        }
+
+        .sidebar-nav-group > summary::-webkit-details-marker {
+          display: none;
+        }
+
+        .sidebar-nav-group-trigger {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          border-radius: 0.625rem;
+          color: rgb(var(--color-gray-700));
+          transition: color 0.15s, background-color 0.15s;
+          user-select: none;
+        }
+
+        .dark .sidebar-nav-group-trigger {
+          color: rgb(var(--color-gray-300));
+        }
+
+        .sidebar-nav-group-trigger:hover {
+          background: rgb(var(--color-gray-100) / 0.8);
+        }
+
+        .dark .sidebar-nav-group-trigger:hover {
+          background: rgb(var(--color-gray-800) / 0.45);
+        }
+
+        .sidebar-nav-group-label {
+          display: flex;
+          align-items: center;
+          gap: 0.625rem;
+          min-width: 0;
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+
+        .sidebar-nav-group-icon {
+          flex: none;
+          color: rgb(var(--color-gray-500));
+        }
+
+        .dark .sidebar-nav-group-icon {
+          color: rgb(var(--color-gray-400));
+        }
+
+        .sidebar-nav-group-chevron {
+          flex: none;
+          color: rgb(var(--color-gray-400));
+          transition: transform 0.18s ease;
+        }
+
+        .sidebar-nav-group[open] .sidebar-nav-group-chevron {
+          transform: rotate(180deg);
+        }
+
+        .sidebar-nav-group-items {
+          list-style: none;
+          margin: 0.25rem 0 0;
+          padding: 0;
+        }
+
+        /* ── Docs area: push right of sidebar ── */
+
         @media (min-width: 1024px) {
           #docs {
             padding-left: 18rem;
             transition: padding-left 0.2s;
           }
-          /* Collapsed docs offset = icon strip width */
           #docs.sidebar-collapsed {
             padding-left: 3.5rem;
           }

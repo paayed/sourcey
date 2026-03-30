@@ -59,13 +59,6 @@ export function buildNavFromSpec(
   const introItems: SiteNavItem[] = [
     { label: "Introduction", href: `${basePath}#introduction`, id: "introduction" },
   ];
-  if (Object.keys(spec.securitySchemes).length > 0) {
-    introItems.push({
-      label: "Authentication",
-      href: `${basePath}#authentication`,
-      id: "authentication",
-    });
-  }
   groups.push({ label: "", items: introItems });
 
   // Tag groups with operations
