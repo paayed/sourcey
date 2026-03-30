@@ -1,7 +1,6 @@
 import { useContext } from "preact/hooks";
 import { NavigationContext, OptionsContext, SiteContext } from "../../renderer/context.js";
 import { SocialIcon } from "../ui/SocialIcon.js";
-import { Logo } from "../ui/Logo.js";
 import type { SiteNavigation } from "../../core/navigation.js";
 
 function SearchIcon() {
@@ -48,7 +47,7 @@ function BreadcrumbChevron() {
 }
 
 /**
- * Mobile breadcrumb bar below the logo row — shows group > page.
+ * Mobile breadcrumb bar — shows group > page on small screens.
  */
 function MobileBreadcrumbs({ nav }: { nav: SiteNavigation }) {
   const activeTab = nav.tabs.find((t) => t.slug === nav.activeTabSlug);
@@ -57,7 +56,7 @@ function MobileBreadcrumbs({ nav }: { nav: SiteNavigation }) {
     .find((item) => item.id === nav.activePageSlug);
 
   return (
-    <div class="flex lg:hidden items-center h-14 px-5 text-sm overflow-hidden">
+    <div class="flex lg:hidden items-center h-12 px-4 text-sm overflow-hidden border-t border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-300)/0.06)]">
       <div class="flex items-center min-w-0 space-x-3 leading-6 whitespace-nowrap">
         {nav.tabs.length > 1 && activeTab && activePage?.label !== activeTab.label && (
           <div class="flex items-center space-x-3 shrink-0 text-[rgb(var(--color-gray-500))] dark:text-[rgb(var(--color-gray-400))]">
@@ -77,9 +76,15 @@ function MobileBreadcrumbs({ nav }: { nav: SiteNavigation }) {
 
 /**
  * Site header.
- * Row 1 (h-16): logo, search (desktop), navbar links (desktop), theme toggle (desktop), search + hamburger (mobile)
- * Row 2 mobile (h-14): breadcrumbs (group > page)
- * Row 2 desktop (h-12): navigation tabs (when multiple tabs)
+ *
+ * Desktop (lg+):
+ *   - Fixed bar that starts at left:18rem (right edge of sidebar).
+ *   - When sidebar collapses to icon strip, header shifts left to 3.5rem
+ *     (icon strip width) — NOT to 0, so it stays aligned with content.
+ *
+ * Mobile:
+ *   - Full-width bar with logo + search icon + hamburger.
+ *   - Breadcrumb strip below shows current group > page.
  */
 export function Header() {
   const nav = useContext(NavigationContext);
@@ -87,130 +92,214 @@ export function Header() {
   const site = useContext(SiteContext);
 
   const base = options.assetBase;
-  const logoHref = site.logo?.href ?? `${base}${nav.tabs[0]?.href ?? ""}`;
 
   return (
-    <div id="navbar" class="z-30 fixed lg:sticky top-0 w-full">
-      <div class="absolute w-full h-full flex-none border-b border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-300)/0.06)] bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-background-dark))]" />
+    <>
+      {/* ══════════════════════════════════════════
+          Desktop header — offset right of sidebar
+          ══════════════════════════════════════════ */}
+      <div
+        id="navbar"
+        class="z-20 hidden lg:flex flex-col fixed top-0 right-0
+               bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-background-dark))]
+               border-b border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-300)/0.06)]
+               transition-[left] duration-200"
+        style="left: 18rem;"
+      >
+        {/* ── Main row ── */}
+        <div class="flex items-center h-16 px-6 gap-x-4 min-w-0">
 
-      <div class="max-w-[92rem] mx-auto relative">
-        {/* Row 1: Logo + Search + Actions */}
-        <div class="relative">
-          <div class="flex items-center lg:px-12 h-16 min-w-0 mx-4 lg:mx-0">
-            <div class="h-full relative flex-1 flex items-center gap-x-4 min-w-0 border-b border-[rgb(var(--color-gray-500)/0.08)] dark:border-[rgb(var(--color-gray-300)/0.08)]">
-              {/* Logo */}
-              <div class="flex-1 flex items-center gap-x-4">
-                <Logo href={logoHref} logo={site.logo} name={site.name} />
-              </div>
+          {/* Spacer */}
+          <div class="flex-1" />
 
-              {/* Search bar (desktop) */}
-              <div class="relative hidden lg:flex items-center flex-1 z-20 gap-2.5">
-                <button
-                  id="search-open"
-                  type="button"
-                  aria-label="Search"
-                  class="group flex pointer-events-auto rounded-lg w-full items-center text-sm leading-6 h-9 pl-3.5 pr-3 text-[rgb(var(--color-gray-500))] dark:text-[rgb(var(--color-gray-400))] ring-1 ring-[rgb(var(--color-gray-400)/0.3)] hover:ring-[rgb(var(--color-gray-600)/0.3)] dark:ring-[rgb(var(--color-gray-600)/0.3)] dark:hover:ring-[rgb(var(--color-gray-500)/0.3)] justify-between truncate gap-2 min-w-[43px] cursor-pointer bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-background-dark))] dark:brightness-110 dark:hover:brightness-125"
-                >
-                  <div class="flex items-center gap-2 min-w-[42px]">
-                    <SearchIcon />
-                    <div class="truncate min-w-0">Search test</div>
-                  </div>
-                  <kbd class="flex-none ml-auto size-5 flex items-center justify-center text-xs font-semibold text-[rgb(var(--color-gray-400))] bg-[rgb(var(--color-gray-100)/0.5)] dark:bg-[rgb(var(--color-surface-dark-tint)/0.1)] border border-[rgb(var(--color-gray-200))] dark:border-[rgb(var(--color-border-dark-subtle)/0.1)] rounded-sm">/</kbd>
-                </button>
-              </div>
+          {/* Search */}
+          <button
+            id="search-open"
+            type="button"
+            aria-label="Search"
+            class="flex items-center text-sm h-9 px-3 rounded-full gap-2 cursor-pointer w-60
+                   text-[rgb(var(--color-gray-500))] dark:text-[rgb(var(--color-gray-400))]
+                   ring-1 ring-[rgb(var(--color-gray-400)/0.3)] hover:ring-[rgb(var(--color-gray-500)/0.4)]
+                   dark:ring-[rgb(var(--color-gray-600)/0.3)] dark:hover:ring-[rgb(var(--color-gray-500)/0.3)]
+                   bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-background-dark))]
+                   dark:brightness-110 dark:hover:brightness-125 transition-all"
+          >
+            <SearchIcon />
+            <span class="text-[rgb(var(--color-gray-400))] text-sm">Search docs...</span>
+          </button>
 
-              {/* Right actions (desktop): navbar links + CTA + theme toggle */}
-              <div class="flex-1 relative hidden lg:flex items-center ml-auto justify-end space-x-4">
-                <nav class="text-sm">
-                  <ul class="flex space-x-6 items-center">
-                    {site.navbar.links.map((link) => (
-                      <li key={link.href}>
-                        <a
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-gray-600))] dark:hover:text-[rgb(var(--color-gray-300))]"
-                        >
-                          {link.type === "link"
-                            ? (link.label ?? link.href)
-                            : (<><SocialIcon type={link.type} />{link.label && <span class="ml-1">{link.label}</span>}</>)}
-                        </a>
-                      </li>
-                    ))}
-                    {site.navbar.primary && (
-                      <li>
-                        <a
-                          href={site.navbar.primary.href}
-                          target="_blank"
-                          class="group px-4 py-1.5 relative inline-flex items-center text-sm font-medium"
-                        >
-                          <span class="absolute inset-0 bg-[rgb(var(--color-primary-dark))] rounded-lg group-hover:opacity-90" />
-                          <span class="z-10 text-white">{site.navbar.primary.label}</span>
-                        </a>
-                      </li>
-                    )}
-                  </ul>
-                </nav>
-                <div class="flex items-center">
-                  <button
-                    id="theme-toggle"
-                    type="button"
-                    aria-label="Toggle theme"
-                    class="group p-2 flex items-center justify-center cursor-pointer text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-gray-600))] dark:text-[rgb(var(--color-gray-500))] dark:hover:text-[rgb(var(--color-gray-300))]"
+          {/* Nav links */}
+          <nav class="text-sm">
+            <ul class="flex items-center">
+              {site.navbar.links.length > 0
+                ? site.navbar.links.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="px-3 py-1.5 font-medium
+                               text-[rgb(var(--color-gray-600))] hover:text-[rgb(var(--color-gray-900))]
+                               dark:text-[rgb(var(--color-gray-400))] dark:hover:text-[rgb(var(--color-gray-200))]
+                               transition-colors"
+                    >
+                      {link.type === "link"
+                        ? (link.label ?? link.href)
+                        : (
+                          <>
+                            <SocialIcon type={link.type} />
+                            {link.label && <span class="ml-1">{link.label}</span>}
+                          </>
+                        )}
+                    </a>
+                  </li>
+                ))
+                : nav.tabs.map((tab) => (
+                  <li key={tab.slug}>
+                    <a
+                      href={`${base}${tab.href}`}
+                      class="px-3 py-1.5 font-medium
+                               text-[rgb(var(--color-gray-600))] hover:text-[rgb(var(--color-gray-900))]
+                               dark:text-[rgb(var(--color-gray-400))] dark:hover:text-[rgb(var(--color-gray-200))]
+                               transition-colors"
+                    >
+                      {tab.label}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </nav>
+
+          {/* Primary CTA */}
+          {site.navbar.primary && (
+            <a
+              href={site.navbar.primary.href}
+              target="_blank"
+              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold
+                     text-white bg-[rgb(var(--color-primary-dark))] hover:opacity-90
+                     transition-opacity whitespace-nowrap"
+            >
+              {site.navbar.primary.label}
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2.5 7H11.5M11.5 7L8 3.5M11.5 7L8 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          )}
+
+          {/* Theme toggle */}
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            class="p-2 flex items-center justify-center cursor-pointer rounded-md
+                   text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-gray-600))]
+                   dark:text-[rgb(var(--color-gray-500))] dark:hover:text-[rgb(var(--color-gray-300))]
+                   hover:bg-[rgb(var(--color-gray-100))] dark:hover:bg-[rgb(var(--color-gray-800)/0.5)]
+                   transition-colors"
+          >
+            <SunIcon />
+            <MoonIcon />
+          </button>
+        </div>
+
+        {/* ── Tab row (only when multiple tabs) ── */}
+        {nav.tabs.length > 1 && (
+          <div class="flex h-10 px-6 border-t border-[rgb(var(--color-gray-200)/0.5)] dark:border-[rgb(var(--color-gray-300)/0.06)]">
+            <div class="h-full flex text-sm gap-x-6">
+              {nav.tabs.map((tab) => {
+                const isActive = tab.slug === nav.activeTabSlug;
+                return (
+                  <a
+                    key={tab.slug}
+                    href={`${base}${tab.href}`}
+                    class={`group relative h-full flex items-center gap-2 font-medium cursor-pointer transition-colors ${isActive
+                        ? "text-[rgb(var(--color-gray-800))] dark:text-[rgb(var(--color-gray-200))]"
+                        : "text-[rgb(var(--color-gray-500))] dark:text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-gray-800))] dark:hover:text-[rgb(var(--color-gray-300))]"
+                      }`}
                   >
-                    <SunIcon />
-                    <MoonIcon />
-                  </button>
-                </div>
-              </div>
-
-              {/* Mobile actions: search + hamburger */}
-              <div class="flex lg:hidden items-center gap-3">
-                <button id="search-open-mobile" type="button" aria-label="Search" class="text-[rgb(var(--color-gray-500))] w-8 h-8 flex items-center justify-center">
-                  <SearchIcon />
-                </button>
-                <button type="button" data-drawer-slide="right" aria-label="Open menu" class="text-[rgb(var(--color-gray-500))] w-8 h-8 flex items-center justify-center hover:text-[rgb(var(--color-gray-600))]">
-                  <svg class="h-4" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                    <path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
-                  </svg>
-                </button>
-              </div>
+                    {tab.label}
+                    {isActive && (
+                      <div class="absolute bottom-0 h-[2px] w-full left-0 bg-[rgb(var(--color-primary))] dark:bg-[rgb(var(--color-primary-light))]" />
+                    )}
+                  </a>
+                );
+              })}
             </div>
           </div>
-        </div>
-
-        {/* Mobile breadcrumb bar: group > page */}
-        <MobileBreadcrumbs nav={nav} />
-
-        {/* Desktop: Navigation tabs (hidden when single tab) */}
-        {nav.tabs.length > 1 && (
-        <div class="hidden lg:flex px-12 h-12">
-          <div class="h-full flex text-sm gap-x-6">
-            {nav.tabs.map((tab) => {
-              const isActive = tab.slug === nav.activeTabSlug;
-              return (
-                <a
-                  key={tab.slug}
-                  href={`${base}${tab.href}`}
-                  class={`group relative h-full gap-2 flex items-center font-medium cursor-pointer transition-colors ${
-                    isActive
-                      ? "text-[rgb(var(--color-gray-800))] dark:text-[rgb(var(--color-gray-200))]"
-                      : "text-[rgb(var(--color-gray-600))] dark:text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-gray-800))] dark:hover:text-[rgb(var(--color-gray-300))]"
-                  }`}
-                >
-                  {tab.label}
-                  {isActive ? (
-                    <div class="absolute bottom-0 h-[1.5px] w-full left-0 bg-[rgb(var(--color-primary))] dark:bg-[rgb(var(--color-primary-light))]" />
-                  ) : (
-                    <div class="absolute bottom-0 h-[1.5px] w-full left-0 group-hover:bg-[rgb(var(--color-gray-200))] dark:group-hover:bg-[rgb(var(--color-gray-700))]" />
-                  )}
-                </a>
-              );
-            })}
-          </div>
-        </div>
         )}
       </div>
-    </div>
+
+      {/* ══════════════════════════════════════════
+          Mobile header — full width
+          ══════════════════════════════════════════ */}
+      <div
+        id="navbar-mobile"
+        class="z-30 lg:hidden fixed top-0 left-0 right-0
+               bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-background-dark))]
+               border-b border-[rgb(var(--color-gray-200)/0.7)] dark:border-[rgb(var(--color-gray-300)/0.06)]"
+      >
+        <div class="flex items-center h-14 px-4 gap-x-3">
+          {/* Logo on mobile (sidebar not visible on mobile) */}
+          <a href={`${base}${nav.tabs[0]?.href ?? ""}`} class="flex items-center flex-shrink-0">
+            <img
+              src={`${base}assets/logo.png`}
+              alt={site.name ?? "Logo"}
+              class="h-7 w-auto object-contain"
+            />
+          </a>
+
+          <div class="flex-1" />
+
+          <button id="search-open-mobile" type="button" aria-label="Search"
+            class="text-[rgb(var(--color-gray-500))] w-8 h-8 flex items-center justify-center">
+            <SearchIcon />
+          </button>
+
+          <button type="button" data-drawer-slide="right" aria-label="Open menu"
+            class="text-[rgb(var(--color-gray-500))] w-8 h-8 flex items-center justify-center hover:text-[rgb(var(--color-gray-700))]">
+            <svg class="h-4" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" />
+            </svg>
+          </button>
+        </div>
+
+        <MobileBreadcrumbs nav={nav} />
+      </div>
+
+      {/* ══════════════════════════════════════════
+          Script: sync header left offset with sidebar state
+          ══════════════════════════════════════════ */}
+      <script dangerouslySetInnerHTML={{
+        __html: `
+(function () {
+  var SIDEBAR_FULL_WIDTH = '18rem';
+  var SIDEBAR_ICON_WIDTH = '3.5rem'; // collapsed icon-strip width
+  var navbar = document.getElementById('navbar');
+
+  function syncLeft() {
+    var sidebar = document.getElementById('sidebar');
+    if (!navbar) return;
+    navbar.style.left = (sidebar && sidebar.classList.contains('sidebar-collapsed'))
+      ? SIDEBAR_ICON_WIDTH
+      : SIDEBAR_FULL_WIDTH;
+  }
+
+  function init() {
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar && navbar) {
+      new MutationObserver(syncLeft).observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    }
+    syncLeft();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+        `,
+      }} />
+    </>
   );
 }

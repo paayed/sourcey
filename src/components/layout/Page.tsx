@@ -182,14 +182,14 @@ function DefaultLayout() {
   return (
     <div class="max-w-[92rem] mx-auto relative px-4 lg:px-8">
       <Sidebar />
-      <div id="docs" class="pt-[8.5rem] lg:pt-10">
+      <div id="docs" class="pt-[calc(var(--header-height)+2rem)]">
         {page.kind === "markdown" ? (
           <div class="flex flex-row-reverse gap-12 box-border w-full">
             <TableOfContents headings={page.markdown!.headings} />
-            <MarkdownPageContent page={page.markdown!} className="lg:pl-[23.7rem] lg:-ml-12 xl:w-[calc(100%-28rem)]" />
+            <MarkdownPageContent page={page.markdown!} className="xl:w-[calc(100%-28rem)]" />
           </div>
         ) : (
-          <SpecPageContent className="lg:pl-[23.7rem] lg:-ml-12" />
+          <SpecPageContent />
         )}
       </div>
     </div>
@@ -201,7 +201,7 @@ function MinimalLayout() {
 
   return (
     <div class="max-w-3xl mx-auto relative px-4 lg:px-8">
-      <div id="docs" class="pt-[8.5rem] lg:pt-10">
+      <div id="docs" class="pt-[calc(var(--header-height)+1rem)]">
         {page.kind === "markdown" ? (
           <MarkdownPageContent page={page.markdown!} />
         ) : (
@@ -218,14 +218,14 @@ function ApiFirstLayout() {
   return (
     <div class="max-w-[92rem] mx-auto relative px-4 lg:px-8">
       <Sidebar />
-      <div id="docs" class="pt-[8.5rem] lg:pt-10">
+      <div id="docs" class="pt-[calc(var(--header-height)+1rem)]">
         {page.kind === "markdown" ? (
           <div class="flex flex-row-reverse gap-12 box-border w-full">
             <TableOfContents headings={page.markdown!.headings} />
-            <MarkdownPageContent page={page.markdown!} className="lg:pl-[23.7rem] lg:-ml-12 xl:w-[calc(100%-28rem)]" />
+            <MarkdownPageContent page={page.markdown!} className="xl:w-[calc(100%-28rem)]" />
           </div>
         ) : (
-          <SpecPageContent className="lg:pl-[23.7rem] lg:-ml-12" />
+          <SpecPageContent />
         )}
       </div>
     </div>
@@ -242,7 +242,7 @@ export function Page() {
 
   const Layout = preset === "minimal" ? MinimalLayout
     : preset === "api-first" ? ApiFirstLayout
-    : DefaultLayout;
+      : DefaultLayout;
 
   return (
     <div id="page" class="relative antialiased text-[rgb(var(--color-gray-500))] dark:text-[rgb(var(--color-gray-400))]">
@@ -258,7 +258,7 @@ export function Page() {
             <input
               id="search-input"
               type="text"
-              placeholder="Search test"
+              placeholder="Search docs..."
               autocomplete="off"
               spellcheck={false}
             />
