@@ -258,7 +258,7 @@ export function Page() {
             <input
               id="search-input"
               type="text"
-              placeholder="Search docs..."
+              placeholder="Search test"
               autocomplete="off"
               spellcheck={false}
             />

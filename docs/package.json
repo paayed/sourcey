@@ -1,0 +1,12 @@
+{
+  "name": "sourcey",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sourcey dev",
+    "build": "sourcey build"
+  },
+  "dependencies": {
+    "sourcey": "^3.3.5"
+  }
+}

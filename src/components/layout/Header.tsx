@@ -113,7 +113,7 @@ export function Header() {
                 >
                   <div class="flex items-center gap-2 min-w-[42px]">
                     <SearchIcon />
-                    <div class="truncate min-w-0">Search docs...</div>
+                    <div class="truncate min-w-0">Search test</div>
                   </div>
                   <kbd class="flex-none ml-auto size-5 flex items-center justify-center text-xs font-semibold text-[rgb(var(--color-gray-400))] bg-[rgb(var(--color-gray-100)/0.5)] dark:bg-[rgb(var(--color-surface-dark-tint)/0.1)] border border-[rgb(var(--color-gray-200))] dark:border-[rgb(var(--color-border-dark-subtle)/0.1)] rounded-sm">/</kbd>
                 </button>
