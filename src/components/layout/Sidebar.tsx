@@ -149,32 +149,6 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* ── Icon strip — only visible when collapsed ── */}
-        <div class="sidebar-icon-strip flex flex-col items-center gap-4 pt-4 flex-1">
-          <div class="relative group">
-            <button
-              type="button"
-              data-sidebar-toggle
-              aria-label="Open sidebar — API Reference"
-              class="p-2 rounded-md
-                     text-[rgb(var(--color-gray-400))] hover:text-[rgb(var(--color-primary))]
-                     dark:text-[rgb(var(--color-gray-500))] dark:hover:text-[rgb(var(--color-primary-light))]
-                     hover:bg-[rgb(var(--color-gray-100))] dark:hover:bg-[rgb(var(--color-gray-800)/0.5)]
-                     transition-colors"
-            >
-              <ApiReferenceIcon />
-            </button>
-            <div class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2
-                        px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap
-                        bg-[rgb(var(--color-gray-800))] text-[rgb(var(--color-gray-100))]
-                        dark:bg-[rgb(var(--color-gray-100))] dark:text-[rgb(var(--color-gray-900))]
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50
-                        shadow-md">
-              API Reference
-            </div>
-          </div>
-        </div>
-
         {/* ── Scrollable nav ── */}
         <div class="sidebar-nav-content flex-1 overflow-y-auto overflow-x-hidden">
           <div class="px-4 pt-5 pb-10 text-sm leading-6">
