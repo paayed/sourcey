@@ -77,7 +77,7 @@ export function Operation({ operation: op, serverUrl }: OperationProps) {
         </div>
 
         {/* Right: sticky code panel */}
-        <aside class={`hidden ${apiFirst ? "lg:block" : "xl:block"} w-[28rem] shrink-0 sticky self-start overflow-y-auto space-y-4`} style="top: calc(var(--header-height) + 2.5rem); max-height: calc(100vh - var(--header-height) - 5rem)">
+        <aside class={`hidden ${apiFirst ? "lg:block" : "xl:block"} w-[28rem] shrink-0 sticky self-start overflow-visible space-y-4`} style="top: calc(var(--header-height) + 2.5rem); max-height: calc(100vh - var(--header-height) - 5rem)">
           <CodeSamplesExamples operation={op} serverUrl={serverUrl} codeSampleLangs={site.codeSamples} />
           {hasBody && <RequestBodyExample body={op.requestBody!} />}
           <ResponsesExamples responses={op.responses} />

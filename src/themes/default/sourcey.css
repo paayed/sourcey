@@ -1054,19 +1054,39 @@ h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
+  border-radius: var(--radius);
+}
+
+#sourcey .code-group::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   border-radius: var(--radius);
   border: 1px solid rgb(var(--color-stone-950) / 0.1);
+  pointer-events: none;
+  z-index: 5;
 }
 .dark #sourcey .code-group {
+  border-color: transparent;
+}
+
+.dark #sourcey .code-group::before {
   border-color: rgb(255 255 255 / 0.1);
 }
 
 #sourcey .code-group > div:first-child {
   background: rgb(var(--color-stone-50));
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
 }
 .dark #sourcey .code-group > div:first-child {
   background: rgb(255 255 255 / 0.03);
+}
+
+#sourcey .code-group > div:last-child {
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
 }
 
 /* ── Selection ─────────────────────────────────────────────────────── */
