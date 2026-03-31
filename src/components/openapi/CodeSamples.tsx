@@ -49,7 +49,7 @@ export function CodeSamplesExamples({ operation, serverUrl, codeSampleLangs }: C
               </div>
             </button>
             {/* Dropdown menu (hidden by default, toggled by JS) */}
-            <div class="code-lang-menu hidden absolute right-0 top-full mt-1 z-20 min-w-[120px] rounded-lg border border-[rgb(var(--color-stone-200))] dark:border-[rgb(255_255_255/0.1)] bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-stone-900))] shadow-lg py-1" role="listbox">
+            <div class="code-lang-menu hidden absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border border-[rgb(var(--color-stone-200))] dark:border-[rgb(255_255_255/0.14)] bg-[rgb(var(--color-background-light))] dark:bg-[rgb(var(--color-stone-950))] shadow-lg dark:shadow-[0_10px_30px_rgb(0_0_0/0.45)] py-1" role="listbox">
               {samples.map((sample, i) => (
                 <button
                   key={i}
